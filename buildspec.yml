@@ -39,9 +39,9 @@ phases:
       - echo Building Docker image
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-      - aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Address
+      - aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Address'
       - export ENDPOINT=$(aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Address')
-      - aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Port
+      - aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Port'
       - export PORT=$(aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Port')
       - export USERNAME=$(aws ssm get-parameter --name DATABASE_USERNAME| jq .Parameter.Value)
       - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq .Parameter.Value)
