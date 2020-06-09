@@ -14,7 +14,7 @@ resource "aws_security_group" "db" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.ecs.id}"]
+    security_groups = list(aws_security_group.ecs.id, aws_security_group.cb.id)
   }
 
   egress {
