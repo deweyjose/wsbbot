@@ -1,5 +1,5 @@
 
-resource "aws_security_group" "cb" {
+resource "aws_security_group" "sg" {
   name   = "${var.application}-code-build-sg"
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -227,7 +227,7 @@ resource "aws_codebuild_project" "project" {
     aws_subnet.a_priv.id]
 
     security_group_ids = [
-    aws_security_group.cb.id]
+    aws_security_group.sg.id]
   }
 
   logs_config {
