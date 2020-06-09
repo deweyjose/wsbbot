@@ -1,0 +1,74 @@
+version: 0.2
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+
+phases:
+  install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    commands:
+      - apt-get update
+      - apt install jq
+      # - command
+  pre_build:
+    commands:
+      - echo logging into ECR
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$ECR_REGION.amazonaws.com/$APPLICATION
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+  build:
+    commands:
+      - echo Building Docker image
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Address
+      - export ENDPOINT=$(aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Address')
+      - aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Port
+      - export PORT=$(aws rds describe-db-instances --region us-east-1 | jq '.DBInstances[0].Endpoint.Port')
+      - export USERNAME=$(aws ssm get-parameter --name DATABASE_USERNAME| jq .Parameter.Value)
+      - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq .Parameter.Value)
+      - docker run -e FLASK_APP=tools/manage.py -e DATABASE_SERVER=$ENDPOINT -e DATABASE_PORT=$PORT -e DATABASE_NAME=$DATABASE_NAME -e DATABASE_PASSWORD=$PASSWORD -e DATABASE_USERNAME=$USERNAME $REPOSITORY_URI:latest flask db upgrade
+  post_build:
+    commands:
+      - echo Build complete. Pushing Docker image on `date`
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo create taskdef.json
+      - aws ecs describe-task-definition --task-definition wsbbot-api | jq '.taskDefinition' > taskdef.json
+      - envsubst < appspec_template.yaml > appspec.yaml
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+artifacts:
+  files:
+    - appspec.yaml
+    - taskdef.json
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

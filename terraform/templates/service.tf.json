@@ -1,0 +1,50 @@
+[
+  {
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "ecs"
+      }
+    },
+    "entryPoint": null,
+    "portMappings": [
+      {
+        "hostPort": 5000,
+        "protocol": "tcp",
+        "containerPort": 5000
+      }
+    ],
+    "cpu": 512,
+    "memory": 256,
+    "environment": [],
+    "mountPoints": [],
+    "secrets": [
+      {
+        "valueFrom": "APP_SETTINGS",
+        "name": "APP_SETTINGS"
+      },
+      {
+        "valueFrom": "DATABASE_NAME",
+        "name": "DATABASE_NAME"
+      },
+      {
+        "valueFrom": "DATABASE_PASSWORD",
+        "name": "DATABASE_PASSWORD"
+      },
+      {
+        "valueFrom": "DATABASE_SERVER",
+        "name": "DATABASE_SERVER"
+      },
+      {
+        "valueFrom": "DATABASE_USERNAME",
+        "name": "DATABASE_USERNAME"
+      }
+    ],
+    "volumesFrom": [],
+    "image": "${image}",
+    "essential": true,
+    "name": "${name}"
+  }
+]
