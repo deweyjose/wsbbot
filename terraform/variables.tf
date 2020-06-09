@@ -26,24 +26,6 @@ variable "hosted_zone_name" {
   description = "Route53 hosted zone name"
 }
 
-# CODEBUILD...
-
-variable "cb_igw_id" {
-  default = "CODEBUILD. ID of the Internet gateway to use for public subnet."
-}
-
-variable "cb_vpc_id" {
-  description = "CODEBUILD. ID of the VPC for subnets"
-}
-
-variable "cb_pub_cidr_block" {
-  description = "CODEBUILD. CIDR block for public subnet"
-}
-
-variable "cb_priv_cidr_block" {
-  description = "CODEBUILD. CIDR block for private subnet"
-}
-
 variable "github_url" {
   description = "CODEBUILD. URL to Github repo"
 }

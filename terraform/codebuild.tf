@@ -1,7 +1,7 @@
 
 resource "aws_security_group" "sg" {
   name   = "${var.application}-code-build-sg"
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = aws_vpc.vpc.id
   tags = {
     Name        = "${var.application}-code-build-sg"
     application = var.application
@@ -130,10 +130,29 @@ resource "aws_iam_role_policy" "cb_policy" {
             ],
             "Condition": {
               "StringEquals": {
-                "ec2:Subnet": ["${aws_subnet.cb_private.arn}"],
+                "ec2:Subnet": ["${aws_subnet.a_priv.arn}"],
                 "ec2:AuthorizedService": "codebuild.amazonaws.com"
               }
             }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "rds:DescribeDBInstances"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameters"
+            ],
+            "Resource": [
+                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_NAME",
+                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_SERVER",
+                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_PASSWORD",
+                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_USERNAME"
+            ]
         }
     ]
 }
@@ -202,10 +221,10 @@ resource "aws_codebuild_project" "project" {
   source_version = var.github_branch
 
   vpc_config {
-    vpc_id = data.aws_vpc.vpc.id
+    vpc_id = aws_vpc.vpc.id
 
     subnets = [
-    aws_subnet.cb_private.id]
+    aws_subnet.a_priv.id]
 
     security_group_ids = [
     aws_security_group.sg.id]
