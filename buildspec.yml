@@ -43,8 +43,8 @@ phases:
       - export ENDPOINT=$(aws rds describe-db-instances --region $AWS_REGION | jq -r '.DBInstances[0].Endpoint.Address')
       - aws rds describe-db-instances --region $AWS_REGION | jq -r '.DBInstances[0].Endpoint.Port'
       - export PORT=$(aws rds describe-db-instances --region $AWS_REGION | jq -r '.DBInstances[0].Endpoint.Port')
-      - export USERNAME=$(aws ssm get-parameter --name DATABASE_USERNAME| jq .Parameter.Value)
-      - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq -r .Parameter.Value)
+      - export USERNAME=$(aws ssm get-parameter --name DATABASE_USERNAME| jq -r '.Parameter.Value')
+      - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq -r '.Parameter.Value')
       - docker run -e FLASK_APP=tools/manage.py -e DATABASE_SERVER=$ENDPOINT -e DATABASE_PORT=$PORT -e DATABASE_NAME=$DATABASE_NAME -e DATABASE_PASSWORD=$PASSWORD -e DATABASE_USERNAME=$USERNAME $REPOSITORY_URI:latest flask db upgrade
   post_build:
     commands:
