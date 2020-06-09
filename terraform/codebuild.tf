@@ -145,7 +145,7 @@ resource "aws_iam_role_policy" "cb_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "ssm:GetParameters"
+                "ssm:GetParameter"
             ],
             "Resource": [
                 "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_NAME",
