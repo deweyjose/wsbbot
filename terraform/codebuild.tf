@@ -148,7 +148,6 @@ resource "aws_iam_role_policy" "cb_policy" {
                 "ssm:GetParameter"
             ],
             "Resource": [
-                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_NAME",
                 "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_SERVER",
                 "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_PASSWORD",
                 "arn:aws:ssm:${var.region}:${var.account_id}:parameter/DATABASE_USERNAME"
@@ -202,7 +201,7 @@ resource "aws_codebuild_project" "project" {
 
     environment_variable {
       name = "DATABASE_NAME"
-      value = replace(var.application, "-", "_")
+      value = "${replace(var.application, "-", "_")}_db"
     }
   }
 
