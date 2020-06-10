@@ -16,5 +16,5 @@ COPY tools ./tools
 COPY migrations ./migrations
 COPY main.py ./
 
-ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:5000 --workers=4 --keep-alive=60"
+ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:5000 --workers=4 --keep-alive=60 --log-level=warning"
 CMD ["gunicorn", "main:app"]

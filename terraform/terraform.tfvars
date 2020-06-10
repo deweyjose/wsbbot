@@ -9,7 +9,7 @@ environment_domain_map = {
   "production" : "api.wsbbot.net"
 }
 
-github_url         = "https://github.com/deweyjose/wsbbot.git"
-github_branch      = "master"
-github_owner       = "deweyjose"
-github_repo        = "wsbbot"
+github_url    = "https://github.com/deweyjose/wsbbot.git"
+github_branch = "master"
+github_owner  = "deweyjose"
+github_repo   = "wsbbot"

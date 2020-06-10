@@ -185,22 +185,22 @@ resource "aws_codebuild_project" "project" {
     }
 
     environment_variable {
-      name = "ACCOUNT_ID"
+      name  = "ACCOUNT_ID"
       value = var.account_id
     }
 
     environment_variable {
-      name = "ECR_REGION"
+      name  = "ECR_REGION"
       value = var.ecr_region
     }
 
     environment_variable {
-      name = "APPLICATION"
+      name  = "APPLICATION"
       value = var.application
     }
 
     environment_variable {
-      name = "DATABASE_NAME"
+      name  = "DATABASE_NAME"
       value = "${replace(var.application, "-", "_")}_db"
     }
   }

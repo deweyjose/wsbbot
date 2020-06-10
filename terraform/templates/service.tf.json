@@ -18,7 +18,11 @@
     ],
     "cpu": 512,
     "memory": 256,
-    "environment": [],
+    "environment": [
+      { "name" : "DATABASE_NAME", "value" : "${DATABASE_NAME}" },
+      { "name" : "DATABASE_SERVER", "value" : "${DATABASE_SERVER}" },
+      { "name" : "DATABASE_PORT", "value" : "${DATABASE_PORT}" }
+    ],
     "mountPoints": [],
     "secrets": [
       {
@@ -26,16 +30,8 @@
         "name": "APP_SETTINGS"
       },
       {
-        "valueFrom": "DATABASE_NAME",
-        "name": "DATABASE_NAME"
-      },
-      {
         "valueFrom": "DATABASE_PASSWORD",
         "name": "DATABASE_PASSWORD"
-      },
-      {
-        "valueFrom": "DATABASE_SERVER",
-        "name": "DATABASE_SERVER"
       },
       {
         "valueFrom": "DATABASE_USERNAME",

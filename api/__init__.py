@@ -1,5 +1,6 @@
 import os
 import random
+import logging
 
 from flask import Flask, jsonify
 
@@ -17,7 +18,7 @@ ma.init_app(app)
 
 @app.errorhandler(Exception)
 def handle_exception(error):
-    print(error)
+    app.logger.error(error)
     response = jsonify({'message': "unknown error"})
     response.status_code = 500
     return response

@@ -26,10 +26,13 @@ data "template_file" "container_definition" {
   template = "${file("${path.module}/templates/service.tf.json")}"
 
   vars = {
-    log_group = "/ecs/${var.application}"
-    region    = "${var.region}"
-    image     = "${var.account_id}.dkr.ecr.${var.ecr_region}.amazonaws.com/${var.application}:latest"
-    name      = "${var.application}-task-container"
+    log_group       = "/ecs/${var.application}"
+    region          = "${var.region}"
+    image           = "${var.account_id}.dkr.ecr.${var.ecr_region}.amazonaws.com/${var.application}:latest"
+    name            = "${var.application}-task-container"
+    DATABASE_NAME   = aws_db_instance.db.name
+    DATABASE_SERVER = aws_db_instance.db.endpoint
+    DATABASE_PORT   = aws_db_instance.db.port
   }
 }
 

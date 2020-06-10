@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "cp_bucket" {
   bucket = "${var.application}-code-pipeline"
-  acl    = "private"
 }
 
 resource "aws_iam_role" "cp_role" {
