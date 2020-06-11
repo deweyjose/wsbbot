@@ -31,7 +31,7 @@ data "template_file" "container_definition" {
     image           = "${var.account_id}.dkr.ecr.${var.ecr_region}.amazonaws.com/${var.application}:latest"
     name            = "${var.application}-task-container"
     DATABASE_NAME   = aws_db_instance.db.name
-    DATABASE_SERVER = aws_db_instance.db.endpoint
+    DATABASE_SERVER = replace(aws_db_instance.db.endpoint, ":${aws_db_instance.db.port}","")
     DATABASE_PORT   = aws_db_instance.db.port
   }
 }
