@@ -40,7 +40,7 @@ def index():
         "It's different this time",
         "Don't fight the fed"
     ]
-    return jsonify(terms[random.randrange(0, len(terms))])
+    return terms[random.randrange(0, len(terms))]
 
 app.register_blueprint(account_api)
 app.register_blueprint(stock_api)

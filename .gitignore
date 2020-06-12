@@ -6,3 +6,7 @@ __pycache__/
 .terraform/
 
 .idea/
+
+test-results/
+
+unittests.xml
