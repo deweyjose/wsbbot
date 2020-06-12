@@ -46,9 +46,10 @@ phases:
       - export USERNAME=$(aws ssm get-parameter --name DATABASE_USERNAME| jq -r '.Parameter.Value')
       - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq -r '.Parameter.Value')
       - docker run -e FLASK_APP=tools/manage.py -e DATABASE_SERVER=$ENDPOINT -e DATABASE_PORT=$PORT -e DATABASE_NAME=$DATABASE_NAME -e DATABASE_PASSWORD=$PASSWORD -e DATABASE_USERNAME=$USERNAME $REPOSITORY_URI:latest flask db upgrade
-      - mkdir test-results
-      - docker run -v $(PWD)/test-results:/wsbbot-api/test-results $REPOSITORY_URI:latest pytest test --junit-xml=unittests.xml
-      - ls -al test-results
+      - PWD
+      - ls -al
+      - docker run -v $(PWD):/wsbbot-api wsbbot:latest pytest test --junit-xml=unittests.xml
+      - ls -al
   post_build:
     commands:
       - echo Build complete. Pushing Docker image on `date`
@@ -60,7 +61,7 @@ phases:
 reports:
   pytest-reports:
     files:
-      - test-results/unittests.xml
+      - unittests.xml
       # - location
     #base-directory:
     #discard-paths: yes
