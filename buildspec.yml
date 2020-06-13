@@ -46,9 +46,7 @@ phases:
       - export USERNAME=$(aws ssm get-parameter --name DATABASE_USERNAME| jq -r '.Parameter.Value')
       - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq -r '.Parameter.Value')
       - docker run -e FLASK_APP=tools/manage.py -e DATABASE_SERVER=$ENDPOINT -e DATABASE_PORT=$PORT -e DATABASE_NAME=$DATABASE_NAME -e DATABASE_PASSWORD=$PASSWORD -e DATABASE_USERNAME=$USERNAME $REPOSITORY_URI:latest flask db upgrade
-      - ls -al $CODEBUILD_SRC_DIR
       - docker run -v $CODEBUILD_SRC_DIR:/$APPLICATION $REPOSITORY_URI:latest python -m pytest test --junit-xml=test-results/unittests.xml
-      - ls -al $CODEBUILD_SRC_DIR
   post_build:
     commands:
       - echo Build complete. Pushing Docker image on `date`
