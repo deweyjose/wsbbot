@@ -47,7 +47,7 @@ phases:
       - export PASSWORD=$(aws ssm get-parameter --name DATABASE_PASSWORD --with-decryption | jq -r '.Parameter.Value')
       - docker run -e FLASK_APP=tools/manage.py -e DATABASE_SERVER=$ENDPOINT -e DATABASE_PORT=$PORT -e DATABASE_NAME=$DATABASE_NAME -e DATABASE_PASSWORD=$PASSWORD -e DATABASE_USERNAME=$USERNAME $REPOSITORY_URI:latest flask db upgrade
       - ls -al $CODEBUILD_SRC_DIR
-      - docker run -v $CODEBUILD_SRC_DIR:/wsbbot-api $REPOSITORY_URI:latest pytest test --junit-xml=unittests.xml
+      - docker run -v $CODEBUILD_SRC_DIR:/$APPLICATION $REPOSITORY_URI:latest python -m pytest test --junit-xml=test-results/unittests.xml
       - ls -al $CODEBUILD_SRC_DIR
   post_build:
     commands:
@@ -55,14 +55,13 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo create taskdef.json
-      - aws ecs describe-task-definition --task-definition wsbbot-api | jq '.taskDefinition' > taskdef.json
+      - aws ecs describe-task-definition --task-definition $APPLICATION | jq '.taskDefinition' > taskdef.json
       - envsubst < appspec_template.yaml > appspec.yaml
 reports:
-  pytest-reports:
+  pytest_reports:
     files:
-      - $CODEBUILD_SRC_DIR/unittests.xml
-      # - location
-    #base-directory:
+      - unittests.xml
+    base-directory: $CODEBUILD_SRC_DIR/test-results
     #discard-paths: yes
     file-format: JunitXml
 artifacts:
