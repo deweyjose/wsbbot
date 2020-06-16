@@ -22,6 +22,10 @@ variable "environment_domain_map" {
   type = map
 }
 
+variable "bastion_key_name" {
+  description = "Name of key-pair for bastion host access"
+}
+
 variable "hosted_zone_name" {
   description = "Route53 hosted zone name"
 }
@@ -37,6 +41,7 @@ variable "github_owner" {
 variable "github_repo" {
   description = "repo to build"
 }
+
 variable "github_branch" {
   description = "CODEBUILD. Branch to build"
 }

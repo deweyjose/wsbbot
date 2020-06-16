@@ -7,14 +7,19 @@ data "aws_ssm_parameter" "DATABASE_PASSWORD" {
 }
 
 resource "aws_security_group" "db" {
+  name   = "${var.application}-rds-sg"
   vpc_id = aws_vpc.vpc.id
-  tags   = { application = var.application }
+
+  tags = {
+    application = var.application
+    Name        = "${var.application}-rds-sg"
+  }
 
   ingress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = list(aws_security_group.ecs.id, aws_security_group.sg.id)
+    security_groups = list(aws_security_group.ecs.id, aws_security_group.sg.id, aws_security_group.bastion.id)
   }
 
   egress {

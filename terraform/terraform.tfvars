@@ -13,3 +13,5 @@ github_url    = "https://github.com/deweyjose/wsbbot.git"
 github_branch = "master"
 github_owner  = "deweyjose"
 github_repo   = "wsbbot"
+
+bastion_key_name = "wsbbot-api-bastion-key"

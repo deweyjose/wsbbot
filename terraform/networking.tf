@@ -156,7 +156,10 @@ resource "aws_security_group" "lb" {
   name = "${var.application}-sg-lb"
 
   vpc_id = aws_vpc.vpc.id
-  tags   = { application = var.application }
+  tags = {
+    application = var.application
+    Name        = "${var.application}-lb-sg"
+  }
 
   ingress {
     from_port   = 80
@@ -279,3 +282,18 @@ resource "aws_route53_record" "api" {
   ttl     = "300"
   records = [aws_lb.lb.dns_name]
 }
+
+
+resource "aws_eip" "bastion" {
+  vpc = true
+  tags = {
+    Name        = "${var.application}-bastion"
+    application = var.application
+  }
+}
+
+resource "aws_eip_association" "bastion" {
+  instance_id   = aws_instance.bastion.id
+  allocation_id = aws_eip.bastion.id
+}
+
