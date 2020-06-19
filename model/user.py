@@ -6,8 +6,8 @@ from core.schemas import ma
 
 class User(UserMixin, db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    password = db.Column(db.String())
-    email = db.Column(db.String(255))
+    password = db.Column(db.String(), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
 
 
 class UserSchema(ma.SQLAlchemySchema):

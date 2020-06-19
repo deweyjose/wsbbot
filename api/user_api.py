@@ -1,7 +1,7 @@
 import uuid
 
 from flask import jsonify, request, Blueprint
-from flask_login import login_user
+from flask_login import login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from api.exceptions import NotFound, Unauthorized, AlreadyExists
@@ -57,21 +57,22 @@ def login():
     return jsonify(user_schema.dump(user))
 
 
+@user_api.route("/user/logout")
+@login_required
+def logout():
+    logout_user()
+    return jsonify({"messaged":"logged out"})
+
+
 @user_api.route("/user", methods=["GET"])
+@login_required
 def get_users():
     all_users = User.query.all()
     return jsonify(users_schema.dump(all_users))
 
 
-@user_api.route("/user", methods=["POST"])
-def create_user():
-    user = User(email=request.json['email'])
-    db.session.add(user)
-    db.session.commit()
-    return jsonify(user_schema.dump(user))
-
-
 @user_api.route("/user/<id>", methods=["GET"])
+@login_required
 def get_user(id):
     user = User.query.get(id)
     if (user == None):
@@ -80,9 +81,10 @@ def get_user(id):
 
 
 @user_api.route("/user/<id>", methods=["DELETE"])
+@login_required
 def delete_user(id):
     user = User.query.get(id)
-    if (user == None):
+    if user is None:
         raise NotFound(f"user {id} not found")
     db.session.delete(user)
     db.session.commit()
