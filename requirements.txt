@@ -20,3 +20,5 @@ Werkzeug==1.0.1
 pytest==5.4.3
 flask-login==0.5.0
 pylint==2.5.3
+Flask-Principal==0.4.0
+pylint-flask-sqlalchemy==0.2.0
