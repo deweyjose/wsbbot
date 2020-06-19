@@ -1,5 +1,7 @@
-from api import app
 import unittest
+
+from api import app
+
 
 class ApiTests(unittest.TestCase):
 
@@ -35,6 +37,7 @@ class ApiTests(unittest.TestCase):
         ]
 
         self.assertIn(result, terms)
+
 
 if __name__ == '__main__':
     unittest.main()

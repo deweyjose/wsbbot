@@ -1,7 +1,7 @@
 from flask import jsonify, request, Blueprint
 
-from core.database import db
 from api.exceptions import NotFound
+from core.database import db
 from model.stock import Stock, stock_schema, stocks_schema
 
 stock_api = Blueprint('stock_api', __name__)
