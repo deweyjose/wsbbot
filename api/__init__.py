@@ -10,10 +10,10 @@ API setup
     - index
 """
 
+import logging
 import os
 import random
 import uuid
-from logging.config import dictConfig
 
 from flask import Flask, request, jsonify
 from flask_login import login_user, logout_user, login_required
@@ -27,22 +27,6 @@ from core.authentication import login_manager
 from core.database import db
 from core.schemas import ma
 from model.user import User, user_schema
-
-dictConfig({
-    'version': 1,
-    'formatters': {'default': {
-        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-    }},
-    'handlers': {'wsgi': {
-        'class': 'logging.StreamHandler',
-        'stream': 'ext://flask.logging.wsgi_errors_stream',
-        'formatter': 'default'
-    }},
-    'root': {
-        'level': 'INFO',
-        'handlers': ['wsgi']
-    }
-})
 
 app = Flask("WSBBOT")
 app.config.from_object(os.getenv('APP_SETTINGS', 'core.config.DevelopmentConfig'))
@@ -69,7 +53,7 @@ def handle_unknown(error):
     Try to transform errors with a name and code.
     If those attributes do not exist default to 500/unknown error
     """
-    app.logger.error(error)
+    logging.debug(error)
     return wrapp_error(500 if not error.code else error.code,
                        {"message": "unknown error" if not error.name else error.name})
 
@@ -79,7 +63,7 @@ def handl_not_found(error):
     """
     Catch and transform any NotFound errors into JSON format.
     """
-    return wrapp_error(error.to_dict(), error.status_code)
+    return wrapp_error(error.status_code, error.to_dict())
 
 
 @app.errorhandler(Unauthorized)
@@ -87,7 +71,7 @@ def handle_unauthorized(error):
     """
     Catch and transform any Unauthorized errors into JSON format.
     """
-    return wrapp_error(error.to_dict(), error.status_code)
+    return wrapp_error(error.status_code, error.to_dict())
 
 
 @app.errorhandler(AlreadyExists)
@@ -95,7 +79,7 @@ def handle_already_exists(error):
     """
     Catch and transform any AlreadyExists errors into JSON format.
     """
-    return wrapp_error(error.to_dict(), error.status_code)
+    return wrapp_error(error.status_code, error.to_dict())
 
 
 @app.route("/", methods=["GET"])

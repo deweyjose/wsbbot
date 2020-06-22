@@ -17,5 +17,5 @@ COPY migrations ./migrations
 COPY test ./test
 COPY main.py ./
 
-ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:5000 --workers=4 --keep-alive=60 --log-level=warning"
+ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:5000 --workers=4 --keep-alive=60 --access-logfile=-"
 CMD ["gunicorn", "main:app"]
