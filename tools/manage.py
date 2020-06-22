@@ -12,4 +12,3 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 from model.user import User
-from model.stock import Stock

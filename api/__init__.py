@@ -21,7 +21,6 @@ from flask_principal import Principal
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from api.exceptions import AlreadyExists, Unauthorized, NotFound
-from api.stock_api import stock_api
 from api.user_api import user_api
 from core.authentication import login_manager
 from core.database import db
@@ -168,4 +167,3 @@ def register_user():
 
 
 app.register_blueprint(user_api)
-app.register_blueprint(stock_api)
