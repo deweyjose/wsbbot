@@ -15,9 +15,10 @@ import os
 import random
 import uuid
 
-from flask import Flask, request, jsonify
-from flask_login import login_user, logout_user, login_required
-from flask_principal import Principal
+from flask import Flask, request, jsonify, current_app
+from flask_login import login_user, logout_user, login_required, current_user
+from flask_principal import Principal, identity_changed, Identity, AnonymousIdentity, identity_loaded, UserNeed, \
+    RoleNeed
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from api.exceptions import AlreadyExists, Unauthorized, NotFound
@@ -25,6 +26,7 @@ from api.user_api import user_api
 from core.authentication import login_manager
 from core.database import db
 from core.schemas import ma
+from model.role import Role
 from model.user import User, user_schema
 
 app = Flask("WSBBOT")
@@ -52,9 +54,9 @@ def handle_unknown(error):
     Try to transform errors with a name and code.
     If those attributes do not exist default to 500/unknown error
     """
-    logging.debug(error)
-    return wrapp_error(500 if not error.code else error.code,
-                       {"message": "unknown error" if not error.name else error.name})
+    logging.error(error)
+    return wrapp_error(500 if not hasattr(error, 'code') else error.code,
+                       {"message": "unknown error" if not hasattr(error, 'name') else error.name})
 
 
 @app.errorhandler(NotFound)
@@ -111,12 +113,25 @@ def authenticate_user(email, password):
     return user
 
 
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+    identity.user = current_user
+
+    if hasattr(current_user, 'id'):
+        identity.provides.add(UserNeed(current_user.id))
+
+    if hasattr(current_user, 'roles'):
+        for role in current_user.roles:
+            identity.provides.add(RoleNeed(role.name))
+
+
 @login_manager.user_loader
 def load_user(user_id):
     """
     used by flask-login to pull the user from the database **if** the user has previously authenticated and is "logged in"
     """
-    return User.query.get(user_id)
+    user = User.query.get(user_id)
+    return user
 
 
 @app.route("/login", methods=["POST"])
@@ -134,6 +149,8 @@ def login():
 
     login_user(user, remember)
 
+    identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+
     return jsonify(user_schema.dump(user))
 
 
@@ -144,6 +161,8 @@ def logout():
     Log the user out so session state is cleared.
     """
     logout_user()
+    identity_changed.send(current_app._get_current_object(),
+                          identity=AnonymousIdentity())
     return jsonify({"messaged": "logged out"})
 
 
@@ -159,7 +178,7 @@ def register_user():
     if user:
         raise AlreadyExists(f"A user has already registered with {email}")
 
-    new_user = User(id=uuid.uuid4(), email=email, password=generate_password_hash(password))
+    new_user = User(id=str(uuid.uuid4()), email=email, password=generate_password_hash(password))
     db.session.add(new_user)
     db.session.commit()
 

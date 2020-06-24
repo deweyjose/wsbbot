@@ -3,6 +3,7 @@ from flask_login import login_required
 
 from api.exceptions import NotFound
 from core.database import db
+from core.authorization import admin_permission
 from model.user import User, user_schema, users_schema
 
 user_api = Blueprint('user_api', __name__)
@@ -26,6 +27,7 @@ def get_user(id):
 
 @user_api.route("/user/<id>", methods=["DELETE"])
 @login_required
+@admin_permission.require()
 def delete_user(id):
     user = User.query.get(id)
     if user is None:
