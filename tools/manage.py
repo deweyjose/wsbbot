@@ -11,6 +11,3 @@ db.init_app(app)
 
 migrate = Migrate(app, db)
 
-from model.user import User
-from model.role import Role
-from model.user_role import UserRole

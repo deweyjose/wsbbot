@@ -13,21 +13,17 @@ API setup
 import logging
 import os
 import random
-import uuid
 
-from flask import Flask, request, jsonify, current_app
-from flask_login import login_user, logout_user, login_required, current_user
-from flask_principal import Principal, identity_changed, Identity, AnonymousIdentity, identity_loaded, UserNeed, \
-    RoleNeed
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, jsonify
+from flask_login import current_user
+from flask_principal import PermissionDenied, Principal, identity_loaded, UserNeed, RoleNeed
 
 from api.exceptions import AlreadyExists, Unauthorized, NotFound
 from api.user_api import user_api
 from core.authentication import login_manager
 from core.database import db
 from core.schemas import ma
-from model.role import Role
-from model.user import User, user_schema
+from model.user import User
 
 app = Flask("WSBBOT")
 app.config.from_object(os.getenv('APP_SETTINGS', 'core.config.DevelopmentConfig'))
@@ -57,6 +53,11 @@ def handle_unknown(error):
     logging.error(error)
     return wrapp_error(500 if not hasattr(error, 'code') else error.code,
                        {"message": "unknown error" if not hasattr(error, 'name') else error.name})
+
+
+@app.errorhandler(PermissionDenied)
+def handle_permission_denied(error):
+    return wrapp_error(401, {"message": "Permission Denied"})
 
 
 @app.errorhandler(NotFound)
@@ -99,20 +100,6 @@ def index():
     return terms[random.randrange(0, len(terms))]
 
 
-def authenticate_user(email, password):
-    """
-    Authenticate the User:
-        1. Fetch the user from the database
-        2. Make sure the password hashes match
-    """
-    user = User.query.filter_by(email=email).first()
-
-    if user is None or not check_password_hash(user.password, password):
-        raise Unauthorized("Unauthorized")
-
-    return user
-
-
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):
     identity.user = current_user
@@ -124,6 +111,7 @@ def on_identity_loaded(sender, identity):
         for role in current_user.roles:
             identity.provides.add(RoleNeed(role.name))
 
+    # load any other object the user has authorization for here
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -132,57 +120,6 @@ def load_user(user_id):
     """
     user = User.query.get(user_id)
     return user
-
-
-@app.route("/login", methods=["POST"])
-def login():
-    """
-    Login route:
-    1. authenticate the user
-    2. login_user
-    """
-    email = request.form.get('email')
-    password = request.form.get('password')
-    remember = request.form.get('remember', False)
-
-    user = authenticate_user(email, password)
-
-    login_user(user, remember)
-
-    identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
-
-    return jsonify(user_schema.dump(user))
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    """
-    Log the user out so session state is cleared.
-    """
-    logout_user()
-    identity_changed.send(current_app._get_current_object(),
-                          identity=AnonymousIdentity())
-    return jsonify({"messaged": "logged out"})
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register_user():
-    """
-    Register the user.
-    """
-    email = request.form.get('email')
-    password = request.form.get('password')
-
-    user = User.query.filter_by(email=email).first()
-    if user:
-        raise AlreadyExists(f"A user has already registered with {email}")
-
-    new_user = User(id=str(uuid.uuid4()), email=email, password=generate_password_hash(password))
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify(user_schema.dump(new_user))
 
 
 app.register_blueprint(user_api)

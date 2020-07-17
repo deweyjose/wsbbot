@@ -5,9 +5,9 @@ Revises:
 Create Date: 2020-06-24 10:04:31.513845
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
+from werkzeug.security import generate_password_hash
 
 # revision identifiers, used by Alembic.
 revision = '1e7b3fa51758'
@@ -41,6 +41,10 @@ def upgrade():
 
     op.execute('INSERT INTO "role" ("name") VALUES (\'admin\')')
     op.execute('INSERT INTO "role" ("name") VALUES (\'investor\')')
+
+    pwdhash = generate_password_hash('Greed1sG000d')
+    op.execute('INSERT INTO "user" ("id", "password", "email") VALUES(\'gordon-root\',\'' + pwdhash + '\',\'ggekko@gekkoco.com\')')
+    op.execute('INSERT INTO "user_role" ("user_id", "role_id") VALUES(\'gordon-root\',1)')
 
     # ### end Alembic commands ###
 

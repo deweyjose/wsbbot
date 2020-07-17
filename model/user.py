@@ -2,10 +2,11 @@
 The User model.
 """
 from flask_login import UserMixin
+from marshmallow import fields
 
 from core.database import db
 from core.schemas import ma
-from model.role import Role
+from model.role import role_schema
 from model.user_role import UserRole
 
 
@@ -22,6 +23,7 @@ class UserSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field()
     email = ma.auto_field()
+    roles = fields.Nested(role_schema, many=True)
 
 
 user_schema = UserSchema()
