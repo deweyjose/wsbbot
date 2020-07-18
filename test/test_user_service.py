@@ -1,31 +1,19 @@
 from unittest import TestCase
 
-from service.user_service import UserService
-
 
 class TestUserService(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        pass
+    def test_get_user_by_email(self):
+        self.fail()
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
+    def test_get_user_by_id(self):
+        self.fail()
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
+    def test_get_all_users(self):
+        self.fail()
 
     def test_create_user(self):
-        user_service = UserService(_session=self.session)
-        user = user_service.createUser("b@b.com", "b")
-        self.assertEqual(user.email, "b@b.com")
-        pass
+        self.fail()
 
     def test_delete_user(self):
-        user = UserService.createUser("b@b.com", "b")
-        user = UserService.deleteUser(user.id)
-        pass
+        self.fail()

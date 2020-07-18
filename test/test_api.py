@@ -1,6 +1,6 @@
 import unittest
 
-from api import app
+from controller import app
 
 
 class ApiTests(unittest.TestCase):

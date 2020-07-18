@@ -9,7 +9,7 @@ RUN apk add postgresql-dev gcc python3-dev musl-dev
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY api ./api
+COPY controller ./api
 COPY core ./core
 COPY model ./model
 COPY tools ./tools

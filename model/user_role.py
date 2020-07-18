@@ -6,8 +6,9 @@ from core.database import db
 from core.schemas import ma
 
 class UserRole(db.Model):
-    user_id = db.Column(db.String(36), db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
-    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'), primary_key=True)
+    __tablename__ = 'user_roles'
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'), primary_key=True)
 
 
 class UserRoleSchema(ma.SQLAlchemySchema):

@@ -18,8 +18,8 @@ from flask import Flask, jsonify
 from flask_login import current_user
 from flask_principal import PermissionDenied, Principal, identity_loaded, UserNeed, RoleNeed
 
-from api.exceptions import AlreadyExists, Unauthorized, NotFound
-from api.user_api import user_api
+from controller.exceptions import AlreadyExists, Unauthorized, NotFound
+from controller.user_controller import user_api
 from core.authentication import login_manager
 from core.database import db
 from core.schemas import ma

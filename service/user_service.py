@@ -10,17 +10,17 @@ class UserService:
     def __init__(self, _session=None):
         self.session = _session or db.session
 
-    def getUserByEmail(self, email):
+    def get_user_by_email(self, email):
         return User.query.filter_by(email=email).first()
 
-    def getUserById(self, id):
+    def get_user_by_id(self, id):
         return User.query.get(id)
 
-    def getAllUsers(self):
+    def get_all_users(self):
         return User.query.all()
 
-    def createUser(self, email, password):
-        user = self.getUserByEmail(email)
+    def create_user(self, email, password):
+        user = self.get_user_by_email(email)
 
         if user:
             return None
@@ -30,8 +30,8 @@ class UserService:
         db.session.commit()
         return user
 
-    def deleteUser(self, id):
-        user = self.getUserById(id)
+    def delete_user(self, id):
+        user = self.get_user_by_id(id)
         if user is None:
             return None
         self.session.delete(user)

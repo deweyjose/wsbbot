@@ -9,7 +9,7 @@ class UserRoleService:
 
     def assign_investor_role(self, user_id):
         role = Role.query.filter_by(name='investor').first()
-        new_user_role = UserRole(user_id, role_id=role.id)
+        new_user_role = UserRole(user_id=user_id, role_id=role.id)
         self.session.add(new_user_role)
         self.session.commit()
         return new_user_role

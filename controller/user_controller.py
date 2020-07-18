@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from flask_principal import identity_changed, Identity, AnonymousIdentity
 from werkzeug.security import check_password_hash
 
-from api.exceptions import NotFound, Unauthorized
+from controller.exceptions import NotFound, Unauthorized, AlreadyExists
 from core.authorization import admin_permission
 from model.user import user_schema, users_schema
 from service.user_role_service import UserRoleService
@@ -20,7 +20,7 @@ user_role_service = UserRoleService()
 @login_required
 @admin_permission.require()
 def get_users():
-    all_users = user_service.getAllUsers()
+    all_users = user_service.get_all_users()
     return jsonify(users_schema.dump(all_users))
 
 
@@ -28,7 +28,7 @@ def get_users():
 @login_required
 def get_user(id):
     if admin_permission.can() or current_user.id == id:
-        user = user_service.getUserById(id)
+        user = user_service.get_user_by_id(id)
         if (user == None):
             raise NotFound(f"user {id} not found")
         return jsonify(user_schema.dump(user))
@@ -40,7 +40,7 @@ def get_user(id):
 @login_required
 def delete_user(id):
     if admin_permission.can() or current_user.id == id:
-        user = user_service.deleteUser(id)
+        user = user_service.delete_user(id)
         if user is None:
             raise NotFound(f"user {id} not found")
         return jsonify(user_schema.dump(user))
@@ -54,7 +54,7 @@ def authenticate_user(email, password):
         1. Fetch the user from the database
         2. Make sure the password hashes match
     """
-    user = user_service.getUserByEmail(email)
+    user = user_service.get_user_by_email(email)
 
     if user is None or not check_password_hash(user.password, password):
         raise Unauthorized("Unauthorized")
@@ -102,7 +102,10 @@ def register_user():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    new_user = user_service.createUser(email, password)
+    new_user = user_service.create_user(email, password)
+    if new_user == None:
+        raise AlreadyExists("An account with that email address already exists")
+
     user_role_service.assign_investor_role(new_user.id)
 
-    return jsonify(user_schema.dump(user_service.getUserById(new_user.id)))
+    return jsonify(user_schema.dump(user_service.get_user_by_id(new_user.id)))
