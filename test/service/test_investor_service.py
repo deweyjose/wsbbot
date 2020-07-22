@@ -1,5 +1,5 @@
 from service.investor_service import InvestorService
-from test.test_service_base import TestServiceBase
+from test.service.test_service_base import TestServiceBase
 
 
 class TestInvestorService(TestServiceBase):

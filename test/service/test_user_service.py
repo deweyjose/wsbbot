@@ -1,7 +1,7 @@
 from service.user_service import UserService
-from test.test_service_base import TestServiceBase
+from test.service.test_service_base import TestServiceBase
 from core.database import db
-from model.user import User
+
 
 class TestUserService(TestServiceBase):
     user_svc = UserService()

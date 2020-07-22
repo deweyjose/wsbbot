@@ -1,6 +1,6 @@
 from service.user_role_service import UserRoleService
 from service.user_service import UserService
-from test.test_service_base import TestServiceBase
+from test.service.test_service_base import TestServiceBase
 from core.database import db
 from model.user_role import UserRole
 
