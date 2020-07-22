@@ -102,7 +102,10 @@ def register_user():
     email = request.form.get('email')
     password = request.form.get('password')
 
+
+
     new_user = user_service.create_user(email, password)
+
     if new_user == None:
         raise AlreadyExists("An account with that email address already exists")
 

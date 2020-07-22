@@ -19,15 +19,22 @@ class UserService:
     def get_all_users(self):
         return User.query.all()
 
-    def create_user(self, email, password):
+    def create_user_no_commit(self, email, password):
         user = self.get_user_by_email(email)
 
         if user:
             return None
 
         user = User(id=str(uuid.uuid4()), email=email, password=generate_password_hash(password))
+
         db.session.add(user)
-        db.session.commit()
+
+        return user
+
+    def create_user(self, email, password):
+        user = self.create_user_no_commit(email, password)
+        if user:
+            db.session.commit()
         return user
 
     def delete_user(self, id):
