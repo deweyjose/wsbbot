@@ -82,7 +82,7 @@ def login():
     return jsonify(user_schema.dump(user))
 
 
-@user_api.route("/logout")
+@user_api.route("/logout", methods=["GET"])
 @login_required
 def logout():
     """

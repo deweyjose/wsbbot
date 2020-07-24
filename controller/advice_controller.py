@@ -6,13 +6,7 @@ from core.application import app
 
 advice_api = Blueprint('advice_api', __name__)
 
-
-@app.route("/advice", methods=["GET"])
-def index():
-    """
-    The root route. Returns a random popular WSB phrase.
-    """
-    terms = [
+solid_advice = [
         "Stonks only go up",
         "Pump and dump",
         "All Time High",
@@ -22,4 +16,11 @@ def index():
         "Buy low sell high",
         "Buy high sell high"
     ]
-    return terms[random.randrange(0, len(terms))]
+
+@app.route("/advice", methods=["GET"])
+def index():
+    """
+    The root route. Returns a random popular WSB phrase.
+    """
+
+    return solid_advice[random.randrange(0, len(solid_advice))]
