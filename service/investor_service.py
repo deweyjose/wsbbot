@@ -12,6 +12,10 @@ class InvestorService:
 
     def create_investor(self, email, password):
         user = self.user_svc.create_user_no_commit(email, password)
-        self.user_role_svc.assign_investor_role_no_commit(user.id)
-        db.session.commit()
+        if not user:
+            return None
+
+        # this will commit the transaction for us
+        self.user_role_svc.create_user_role_by_name(user_id=user.id, role_name='investor')
+
         return self.user_svc.get_user_by_id(user.id)
