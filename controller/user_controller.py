@@ -1,11 +1,11 @@
 from flask import Blueprint
 from flask import request, jsonify, current_app
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required
 from flask_principal import identity_changed, Identity, AnonymousIdentity
 from werkzeug.security import check_password_hash
 
 from controller.exceptions import NotFound, Unauthorized, AlreadyExists
-from core.authorization import admin_permission
+from core.authorization import admin_permission, admin_or_me_permission
 from model.user import user_schema, users_schema
 from model.user_role import user_role_schema
 from service.investor_service import InvestorService
@@ -17,6 +17,17 @@ user_api = Blueprint('user_api', __name__)
 user_service = UserService()
 investor_service = InvestorService()
 user_role_service = UserRoleService()
+
+
+@user_api.route('/user/<user_id>/roles/<role_id>', methods=['DELETE'])
+@login_required
+@admin_permission.require()
+def remove_role_from_user(user_id, role_id):
+    """
+    Grant the role to the user. Must be admin
+    """
+    deleted_user_role = user_role_service.delete_role_id_for_user_id(user_id=user_id, role_id=role_id)
+    return jsonify(user_role_schema.dump(deleted_user_role))
 
 
 @user_api.route('/user/<user_id>/roles/<role_id>', methods=['PUT'])
@@ -48,7 +59,7 @@ def get_user(id):
     """
     Get the user: must be admin or logged in user
     """
-    if admin_permission.can() or current_user.id == id:
+    if admin_or_me_permission(id).can():
         user = user_service.get_user_by_id(id)
         if (user == None):
             raise NotFound(f"user {id} not found")
@@ -63,7 +74,7 @@ def delete_user(id):
     """
     Delete the user: must be admin or logged in user
     """
-    if admin_permission.can() or current_user.id == id:
+    if admin_or_me_permission(id).can():
         user = user_service.delete_user(id)
         if user is None:
             raise NotFound(f"user {id} not found")

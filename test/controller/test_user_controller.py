@@ -121,3 +121,23 @@ class TestUserService(TestControllerBase):
             response = c.get(f"/user")
             self.assert200(response)
             self.assertEquals(2, len(response.json))
+
+    def test_remove_role_from_user(self):
+        with self.app.test_client() as c:
+            id1 = self.register("a@a.com", "d", c)['id']
+            id2 = self.register("b@b.com", "e", c)['id']
+
+            user_role_svc = UserRoleService()
+            user_role_svc.create_user_role_by_name(user_id=id1, role_name='admin')
+
+            self.login("a@a.com", "d", c)
+            self.assert200(c.put(f"/user/{id2}/roles/{self.roles['admin'].id}"))
+
+            response = c.get(f"/user/{id2}")
+            self.assertEquals(2, len(response.json['roles']))
+
+            response = c.delete(f"/user/{id2}/roles/{self.roles['admin'].id}")
+            self.assert200(response)
+
+            response = c.get(f"/user/{id2}")
+            self.assertEquals(1, len(response.json['roles']))

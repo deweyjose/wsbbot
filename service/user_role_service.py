@@ -21,3 +21,19 @@ class UserRoleService:
         new_user_role = self.create_user_role_no_commit(user_id, role_id)
         self.session.commit()
         return new_user_role
+
+    def delete_role_id_for_user_id(self, role_id, user_id):
+        deleted_user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).first()
+
+        if deleted_user_role is not None:
+            self.session.delete(deleted_user_role)
+            self.session.commit()
+
+        return deleted_user_role
+
+    def delete_user_roles_for_user_id(self, user_id):
+        deleted_user_roles = UserRole.query.filter_by(user_id=user_id).all()
+        for deleted_user_role in deleted_user_roles:
+            db.session.delete(deleted_user_role)
+        db.session.commit()
+        return deleted_user_roles
